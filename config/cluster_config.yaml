@@ -7,13 +7,13 @@ data:
   cluster.yaml: |
     cluster:
       name: "${CLUSTER_NAME}"
-      provider: "${CLUSTER_PROVIDER}"
+      provider: "eks"
       region: "${AWS_REGION}"
-      
+
     monitoring:
       enabled: true
       namespace: "monitoring"
-      
+
     karpenter:
       enabled: true
       provisioner:
@@ -25,20 +25,3 @@ data:
           - key: "node.kubernetes.io/instance-type"
             operator: In
             values: ["m5.large", "m5.xlarge", "m5.2xlarge"]
-            
-    argocd:
-      enabled: true
-      namespace: "argocd"
-      server: "https://argocd.${CLUSTER_NAME}.local"
-      
-    github_actions:
-      runners:
-        namespace: "github-runner"
-        replicas: 3
-        resources:
-          requests:
-            cpu: "100m"
-            memory: "256Mi"
-          limits:
-            cpu: "500m"
-            memory: "512Mi"

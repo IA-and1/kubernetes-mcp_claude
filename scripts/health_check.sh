@@ -28,7 +28,7 @@ done
 # Verificar pods críticos
 echo ""
 echo "🚨 Critical Pods Status:"
-critical_namespaces=("kube-system" "karpenter" "argocd")
+critical_namespaces=("kube-system" "karpenter")
 
 for ns in "${critical_namespaces[@]}"; do
     if kubectl get namespace $ns >/dev/null 2>&1; then

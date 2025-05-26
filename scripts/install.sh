@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Installing Kubernetes MCP Server..."
+echo "🚀 Installing Kubernetes MCP Server (EKS only)..."
 
 # Verificar prerequisites
 command -v kubectl >/dev/null 2>&1 || { echo "❌ kubectl is required but not installed. Exiting." >&2; exit 1; }
@@ -20,19 +20,13 @@ pip3 install --user -r requirements.txt
 echo "🔗 Verifying cluster connection..."
 kubectl cluster-info || { echo "❌ Cannot connect to Kubernetes cluster. Please check your kubeconfig." >&2; exit 1; }
 
-# Detectar provider del cluster
-PROVIDER="generic"
+# Detectar EKS
 if kubectl get nodes -o json | grep -q "eks.amazonaws.com"; then
     PROVIDER="eks"
     echo "✅ Detected EKS cluster"
-elif kubectl get nodes -o json | grep -q "gke.googleapis.com"; then
-    PROVIDER="gke"
-    echo "✅ Detected GKE cluster"
-elif kubectl get nodes -o json | grep -q "aks.azure.com"; then
-    PROVIDER="aks"
-    echo "✅ Detected AKS cluster"
 else
-    echo "ℹ️ Generic Kubernetes cluster detected"
+    echo "❌ This tool is intended for EKS clusters only. Exiting."
+    exit 1
 fi
 
 # Crear configuración del cluster
@@ -45,22 +39,12 @@ envsubst < config/cluster_config.yaml > ~/.local/share/kubernetes-mcp/cluster_co
 # Aplicar configuración al cluster
 kubectl apply -f ~/.local/share/kubernetes-mcp/cluster_config.yaml
 
-# Verificar instalación de Karpenter si es EKS
-if [ "$PROVIDER" = "eks" ]; then
-    echo "🔍 Checking Karpenter installation..."
-    if kubectl get deployment karpenter -n karpenter >/dev/null 2>&1; then
-        echo "✅ Karpenter is installed"
-    else
-        echo "⚠️ Karpenter not found. Consider installing it for better autoscaling."
-    fi
-fi
-
-# Verificar instalación de ArgoCD
-echo "🔍 Checking ArgoCD installation..."
-if kubectl get namespace argocd >/dev/null 2>&1; then
-    echo "✅ ArgoCD namespace found"
+# Verificar instalación de Karpenter
+echo "🔍 Checking Karpenter installation..."
+if kubectl get deployment karpenter -n karpenter >/dev/null 2>&1; then
+    echo "✅ Karpenter is installed"
 else
-    echo "⚠️ ArgoCD not found. Install it if you want GitOps monitoring."
+    echo "⚠️ Karpenter not found. Consider installing it for better autoscaling."
 fi
 
 echo "✅ Kubernetes MCP Server installation completed!"
