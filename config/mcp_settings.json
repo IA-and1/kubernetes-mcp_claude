@@ -1,0 +1,55 @@
+{
+  "mcpVersion": "2024-11-05",
+  "capabilities": {
+    "tools": {}
+  },
+  "server": {
+    "name": "kubernetes-mcp-server",
+    "version": "1.0.0"
+  },
+  "kubernetes": {
+    "defaultNamespace": "default",
+    "metricsEnabled": true,
+    "providers": {
+      "eks": {
+        "enabled": true,
+        "features": ["karpenter", "load_balancer_controller", "ebs_csi"]
+      },
+      "gke": {
+        "enabled": true,
+        "features": ["gke_autopilot", "workload_identity"]
+      },
+      "aks": {
+        "enabled": true,
+        "features": ["aks_nodepool_autoscaler"]
+      }
+    }
+  },
+  "monitoring": {
+    "healthCheckInterval": 300,
+    "metricsRetention": "7d",
+    "alerting": {
+      "enabled": true,
+      "thresholds": {
+        "cpuUtilization": 80,
+        "memoryUtilization": 85,
+        "diskUtilization": 90,
+        "podRestartCount": 5
+      }
+    }
+  },
+  "integrations": {
+    "argocd": {
+      "enabled": true,
+      "namespace": "argocd"
+    },
+    "karpenter": {
+      "enabled": true,
+      "namespace": "karpenter"
+    },
+    "prometheus": {
+      "enabled": false,
+      "namespace": "monitoring"
+    }
+  }
+}

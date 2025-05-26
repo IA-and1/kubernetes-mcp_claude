@@ -1,0 +1,4 @@
+mcp>=0.9.0
+pyyaml>=6.0
+kubernetes>=28.1.0
+asyncio-subprocess>=0.1.0
